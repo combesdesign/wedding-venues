@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wedding venue shortlist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: warm, romantic, easygoing; a shortlist for two people to swipe through together
+   IDEA: a stack of seaside postcards pinned to a sea chart
+   PICTURE: a sea chart with numbered pins, plus a painted postcard scene on every venue card
+   COLOUR and TYPE: Riviera azure dominant, Provence lavender support, sun yellow accent; Fraunces + Inter
+   LAYOUT: title, then chart full width, filters, then a grid of postcard cards that stacks to one column on phones */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0b1626);--ink:light-dark(#0f2238,#eaf1fb);--soft:light-dark(#5a6b80,#9fb1c7);
+--sea:light-dark(#1f63b5,#3d86de);--sea2:light-dark(#e7f0fb,#12253d);--lav:light-dark(#c9bbec,#5d4f8a);
+--sun:#ffc93c;--land:light-dark(#f4ecdc,#1b3250);--edge:light-dark(#ffffff,#2c4a70);--card:light-dark(#ffffff,#10203a);--line:light-dark(#dfe7f1,#223652)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;line-height:1.05;margin:0;text-wrap:balance}
+h1{font-size:clamp(32px,5vw,50px)}
+.lede{color:var(--soft);max-width:62ch;margin:12px 0 0}
+.top{background:var(--sea2)}
+.chart{position:relative;margin-top:22px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,light-dark(#cfe3f8,#0f2a4a),light-dark(#9cc4ee,#0a213d));aspect-ratio:16/8;min-height:260px}
+.chart svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{cursor:pointer}
+.pin circle{transition:transform .2s}
+.pin:hover circle,.pin:focus circle{transform:scale(1.15)}
+.pin:focus{outline:none}
+.reset{position:absolute;right:12px;top:12px;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:#fff;color:#0f2238;font:600 15px Inter,sans-serif;box-shadow:0 2px 8px #0003;cursor:pointer}
+.reset[hidden]{display:none}
+.links button{flex:1;min-height:44px;border-radius:12px;font:600 15px Inter,sans-serif;border:1.5px solid var(--sea);color:var(--sea);background:none;cursor:pointer}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:14px;color:var(--soft)}
+.temps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px 24px;margin-top:22px}
+.trow{font-size:14px}
+.trow b{display:flex;justify-content:space-between;font-weight:500}
+.bar{height:10px;border-radius:6px;background:var(--line);margin-top:5px;position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:6px;background:linear-gradient(90deg,var(--sea),var(--sun))}
+.bar s{position:absolute;inset:0 auto 0 0;border-radius:6px;background:var(--lav);opacity:.9;text-decoration:none}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:22px}
+.chip{font:500 15px Inter,sans-serif;min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--sea);border-color:var(--sea);color:#fff}
+.chip:focus-visible,.card a:focus-visible,.heart:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.count{margin-left:auto;color:var(--soft);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;scroll-margin-top:20px}
+.card.flash{box-shadow:0 0 0 3px var(--sun)}
+.pc{position:relative;aspect-ratio:2/1}
+.pc svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.num{position:absolute;left:12px;top:12px;width:32px;height:32px;border-radius:50%;background:#fff;color:#0f2238;font:600 15px Inter,sans-serif;display:grid;place-items:center;box-shadow:0 2px 6px #0003}
+.heart{position:absolute;right:10px;top:8px;width:44px;height:44px;border:0;border-radius:50%;background:#ffffffd9;color:#d2456b;font-size:22px;cursor:pointer;line-height:1}
+.gal{position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.gal::-webkit-scrollbar{display:none}
+.gal figure{position:relative;flex:0 0 100%;height:100%;margin:0;scroll-snap-align:start}
+.gal img{width:100%;height:100%;object-fit:cover;display:block;background:var(--sea2)}
+.rm{position:absolute;right:10px;bottom:10px;width:36px;height:36px;border-radius:50%;border:0;background:#000a;color:#fff;font-size:18px;cursor:pointer}
+.pcount{position:absolute;left:52px;top:16px;background:#000a;color:#fff;font-size:13px;padding:3px 9px;border-radius:999px;pointer-events:none}
+.addp{position:absolute;left:12px;bottom:12px;min-height:40px;padding:0 14px;border-radius:999px;border:0;background:#fff;color:#0f2238;font:600 14px Inter,sans-serif;box-shadow:0 2px 6px #0003;cursor:pointer}
+.addp:disabled{opacity:.7}
+.gmap{width:100%;height:220px;border:0;border-radius:12px;display:block}
+.rate{font-size:14px;color:var(--soft)}.rate b{color:var(--ink)}.rate i{font-style:normal;color:#f2a900}
+.body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.where{font-size:13px;color:var(--soft)}
+h3{font-size:24px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;border-block:1px solid var(--line);padding:10px 0}
+.facts div{font-size:13px;color:var(--soft)}
+.facts b{display:block;font-size:16px;color:var(--ink);font-weight:600;white-space:nowrap}
+.card p{margin:0;font-size:15px}
+.fit{font-size:14px;background:var(--sea2);border-radius:10px;padding:8px 10px}
+.links{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.links a{flex:1;min-height:44px;display:grid;place-items:center;border-radius:12px;text-decoration:none;font-weight:600;font-size:15px;border:1.5px solid var(--sea);color:var(--sea)}
+.links a.main{background:var(--sea);color:#fff}
+.note{font-size:13px;color:var(--soft);margin-top:26px}
+.empty{padding:40px;text-align:center;color:var(--soft);border:1.5px dashed var(--line);border-radius:18px}
+@media (prefers-reduced-motion:reduce){.pin circle{transition:none}html{scroll-behavior:auto}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+@media(max-width:600px){.count{margin-left:0;width:100%}.chart{aspect-ratio:4/3}}
+</style>
+</head>
+<body>
+<header class="band top"><div class="wrap">
+<h1>Seaside wedding venues for September and October 2027</h1>
+<p class="lede">Coastal venues in warm-water spots where your guests can stay on site and the reception happens on the grounds. Tap a pin to jump to that venue, or tap the heart to save it.</p>
+<div class="chart" id="chart" role="img" aria-label="Map of the Mediterranean with a numbered pin for each venue"><svg id="map"></svg><button class="reset" id="reset" hidden>Show all</button></div>
+<div class="legend"><span>Tap a pin to jump to that venue</span><span>Tap a country filter below to zoom in</span></div>
+<div class="temps" id="temps"></div>
+<p class="note">Sea temps are rough monthly averages. The bar shows September and the lavender part shows October.</p>
+</div></header>
+
+<main class="band"><div class="wrap"><div id="blocked" hidden style="background:#fff4d6;color:#5a4300;border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:15px">Photos can't load in this viewer. Open this page in Safari or Chrome (or from your Netlify link) to see them.</div>
+<div class="filters" id="filters">
+<button class="chip" data-f="all" aria-pressed="true">All</button>
+<button class="chip" data-f="France" aria-pressed="false">France</button>
+<button class="chip" data-f="Italy" aria-pressed="false">Italy</button>
+<button class="chip" data-f="Spain" aria-pressed="false">Spain</button>
+<button class="chip" data-f="Greece" aria-pressed="false">Greece</button>
+<button class="chip" data-f="big" aria-pressed="false">Sleeps 40+</button>
+<button class="chip" data-f="fav" aria-pressed="false">♥ Saved</button>
+<span class="count" id="count"></span>
+</div>
+<div class="grid" id="grid"></div>
+<p class="note">Prices are starting figures from venue listings and will change for 2027. "Ask" means the venue doesn't publish it. Photos are shown straight from each venue's own website or listing. Ratings are from Google, November 2026. Website opens the venue's own site. Where we couldn't confirm one, it opens a search for it instead.</p>
+</div></main>
+
+<script>
+{
+const regions=[
+ {r:"Côte d'Azur, France",sep:23,oct:20.5},
+ {r:"Mallorca, Spain",sep:26,oct:23},
+ {r:"Sicily, Italy",sep:25,oct:23},
+ {r:"Puglia, Italy",sep:24,oct:21},
+ {r:"Paxos, Greece",sep:25,oct:22}
+];
+const V=[
+ {n:"Domaine Rocabella",imgs:["https://frenchweddingstyle.com/cdn-cgi/image/quality=80,format=auto,fit=cover,width=1200,height=630/https://cdn.frenchweddingstyle.com/2025/04/domaine-cap-azur-30.jpg", "https://frenchweddingstyle.com/cdn-cgi/image/quality=80,format=auto,fit=cover,width=800/https://cdn.frenchweddingstyle.com/2026/09/domaine-rocabella/domaine-rocabella-aerial-garden-ceremony-guests-sea-view.webp", "https://frenchweddingstyle.com/cdn-cgi/image/quality=80,format=auto,fit=cover,width=800/https://cdn.frenchweddingstyle.com/2026/09/domaine-rocabella/domaine-rocabella-dinner-tables-lawn-through-columns-sea-view.webp", "https://frenchweddingstyle.com/cdn-cgi/image/quality=80,format=auto,fit=cover,width=800/https://cdn.frenchweddingstyle.com/2026/09/domaine-rocabella/domaine-rocabella-long-tables-set-before-colonnaded-pavilion.jpg", "https://frenchweddingstyle.com/cdn-cgi/image/quality=80,format=auto,fit=cover,width=800/https://cdn.frenchweddingstyle.com/2026/09/domaine-rocabella/domaine-rocabella-candlelit-dinner-tables-villa-terrace.jpg", "https://frenchweddingstyle.com/cdn-cgi/image/quality=80,format=auto,fit=cover,width=800/https://cdn.frenchweddingstyle.com/2026/09/domaine-rocabella/domaine-rocabella-bride-villa-entrance-steps.jpg"],gr:"4.9",gc:"146",web:"",c:"France",w:"Le Pradet, near Toulon",reg:0,lat:43.106,lon:6.001,s:"cliff",g:"150",sl:"80+",sn:80,p:"€34k",t:"Clifftop estate with a private cove below, infinity pool, several sea-view villas and a main house. It's built for three-day wedding weekends.",fit:"Best match: 60 people all on site with room to spare.",air:"Toulon or Marseille",u:"https://www.frenchweddingstyle.com/wedding-venues/domaine-rocabella/"},
+ {n:"Domaine de Canaille",gr:"5.0",gc:"342",web:"",c:"France",w:"Cassis, Calanques",reg:0,lat:43.208,lon:5.552,s:"cliff",g:"Ask",sl:"24",sn:24,p:"Ask",t:"One of the biggest private estates on the coast. A 400m² terrace above Arena beach, a private path down to the water, a big pool and a hot tub.",fit:"Wedding party stays here, other guests in Cassis.",air:"Marseille",u:"https://frenchweddingstyle.com/wedding-venues/domaine-de-canaille"},
+ {n:"COMO Le Beauvallon",imgs:["https://www.wedaways.com/wp-content/uploads/2025/12/MM-25-COMO-Le-Beauvallon-exterior-2-scaled.jpg", "https://www.wedaways.com/wp-content/uploads/2025/12/MM-25-COMO-Le-Beauvallon-pool-drone-2-scaled.jpg", "https://www.wedaways.com/wp-content/uploads/2025/12/MM-25-COMO-Le-Beauvallon-and-Beauvallon-Sur-Mer-exterior-scaled.jpg", "https://www.wedaways.com/wp-content/uploads/2025/12/MM-25-COMO-Le-Beauvallon-exterior-1-scaled.jpg", "https://www.wedaways.com/wp-content/uploads/2025/12/Le-Beauvallon-Winter-Garden-2-scaled.jpg", "https://www.wedaways.com/wp-content/uploads/2025/12/MM-25-COMO-Suite-4-scaled.jpg"],gr:"4.5",gc:"155",web:"https://www.comohotels.com/france/como-le-beauvallon/occasions/weddings",c:"France",w:"Grimaud, Saint-Tropez bay",reg:0,lat:43.291,lon:6.604,s:"beach",g:"500",sl:"80",sn:80,p:"Ask",t:"Belle Époque palace from 1914 with a private beach, a huge pool by the sea and a sea-view restaurant. A boat runs across to Saint-Tropez. Weddings April to October.",fit:"Full buyout available, so it's just your crew.",air:"Toulon or Nice",u:""},
+ {n:"White House Cannes",imgs:["https://www.whitehousecannes.com/wp-content/uploads/2018/03/20180313_191405-600x400.jpg"],gr:"4.3",gc:"40",web:"https://www.whitehousecannes.com",c:"France",w:"Cannes",reg:0,lat:43.547,lon:7.05,s:"villa",g:"80–150",sl:"15 suites",sn:30,p:"€15k hire",t:"Exclusive-use Belle Époque villa above Cannes with terraced gardens and panoramic sea views. 15 suites on site.",fit:"Very French Riviera. Wedding party stays, others in Cannes.",air:"Nice",u:""},
+ {n:"Hotel Royal-Riviera",gr:"4.8",gc:"640",web:"",c:"France",w:"Saint-Jean-Cap-Ferrat",reg:0,lat:43.702,lon:7.329,s:"beach",g:"60–130",sl:"Hotel",sn:60,p:"Ask",t:"Gardens, beach access, a big pool and hotel rooms with sea views. Easy walk to Cap Ferrat village, minutes from Èze and Villefranche.",fit:"Classic Riviera hotel wedding, everyone in one place.",air:"Nice",u:""},
+ {n:"Son Bunyola",imgs:["https://www.virginlimitededition.com/media/j1qjp1wd/son-bunyola-hotel-with-mountain-sea-view-lr.jpg?width=1000&height=1000&quality=70&v=1dc4aaef8fabdd0", "https://www.virginlimitededition.com/media/t2of0cm0/son-bunyola-bn-wedding-2025-credit-jeroennoordzijphotography-28.jpg?width=1500&height=780&quality=70&v=1dc8181ae5bfa60", "https://www.virginlimitededition.com/media/gawduemq/rayhan-_26-didi-wedding-396.jpg?width=1500&height=780&quality=70&v=1dc8ae7fb737ac0", "https://www.virginlimitededition.com/media/dryfh0ic/rayhan-_26-didi-wedding-1369-1.jpg?width=2000&height=1530&quality=70&v=1dc8ae7e06b9e60", "https://www.virginlimitededition.com/media/jfnhdawr/son-bunyola-168-wedding-shoot-2025-credit-bombillas_y_flores-puycermenophotography.jpg?width=700&height=540&quality=70&v=1dc8181dd273210", "https://www.virginlimitededition.com/media/5trdjlup/mallorcastyledshoot_rpp-305.jpg?width=700&height=540&quality=70&v=1dc4a75132e4220"],gr:"4.7",gc:"169",web:"https://www.virginlimitededition.com/son-bunyola/weddings-celebrations/weddings/",c:"Spain",w:"Banyalbufar, Mallorca",reg:1,lat:39.695,lon:2.541,s:"olive",g:"Ask",sl:"Hotel + 3 villas",sn:60,p:"Ask",t:"An 810-acre estate on Mallorca's northwest coast with a luxury hotel and three villas, all available for exclusive use. Mountain and sea views.",fit:"Warmest water on the list. Very private.",air:"Palma",u:"https://www.virginlimitededition.com/son-bunyola/weddings-celebrations/weddings/"},
+ {n:"Masseria Spina Resort",imgs:["https://www.lalista.com/wp-content/uploads/2026/09/masseria_spina_puglia_wedding_venue_The_lanestream_photo_36fb083e_68e753256338c8d7ca5188a2d251f1a62beb82da.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/masseria_spina_puglia_wedding_venue_Lisa_poggiBELINDALUCA-042-scaled.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/masseria_spina_puglia_wedding_venue_Lisa_poggiBELINDALUCA-041.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/masseria_spina_puglia_wedding_venue_Lisa_poggiBELINDALUCA-036.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/masseria_spina_puglia_wedding_venue_The_lanestream_photo_3dccd5d2_9945e956367cb35291f0cc9014bf931775dbe691_thumb.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/masseria_spina_puglia_wedding_venue_The_lanestream_photo_4acbe544_225dd4f41deb28c14b25bcd4fce72871c6640865_thumb.jpg"],gr:"4.6",gc:"807",web:"https://www.masseriaspinaresort.com",c:"Italy",w:"Monopoli, Puglia",reg:3,lat:40.964,lon:17.269,s:"olive",g:"180",sl:"20–40",sn:30,p:"€15–20k",t:"Old farm estate with terraces, an olive grove ceremony spot and sea views from the terrace. Music can go until 3am with exclusive use.",fit:"Great value. Garden ceremony feel you described.",air:"Bari",u:"https://www.lalista.com/?p=17723"},
+ {n:"Masseria San Nicola",imgs:["https://www.masseriasannicolasavelletri.com/wp-content/uploads/2026/03/DJI_20250528205658_0129_D.jpg", "https://www.masseriasannicolasavelletri.com/wp-content/uploads/2025/07/WB_Apertura_2-scaled.jpg", "https://www.masseriasannicolasavelletri.com/wp-content/uploads/2025/07/Home_Villa-1024x683.jpg", "https://www.masseriasannicolasavelletri.com/wp-content/uploads/2025/07/Home_PiazzettaRooms-1024x684.jpg", "https://www.masseriasannicolasavelletri.com/wp-content/uploads/2026/03/Facciata_Masseria-768x1152.webp", "https://www.masseriasannicolasavelletri.com/wp-content/uploads/2025/06/MSN_Room_1-Medie.jpg"],gr:"4.7",gc:"348",web:"https://www.masseriasannicolasavelletri.com",c:"Italy",w:"Fasano, Puglia",reg:3,lat:40.883,lon:17.367,s:"olive",g:"200",sl:"24",sn:24,p:"€5k/night",t:"A few steps from the sea among olive trees, with four little houses, two pools and a beautiful garden.",fit:"Wedding party on site, others in Monopoli or Fasano.",air:"Brindisi or Bari",u:"https://begonia-crocodile-kkrp.squarespace.com/venues/puglia/masseria-san-nicola"},
+ {n:"Villa Sant'Andrea, Belmond",imgs:["https://img.belmond.com/f_auto/t_320x249/photos/vsa/vsa-occ-banquet-pergola02.jpg"],gr:"4.6",gc:"470",web:"https://www.belmond.com/hotels/europe/italy/taormina/belmond-villa-sant-andrea/weddings",c:"Italy",w:"Taormina, Sicily",reg:2,lat:37.854,lon:15.303,s:"beach",g:"Ask",sl:"Hotel",sn:60,p:"Ask",t:"19th-century villa on a secluded bay with subtropical gardens, its own beach and a sea-view ceremony terrace.",fit:"Glam option. Taormina town is a shuttle away.",air:"Catania",u:"https://www.belmond.com/hotels/europe/italy/taormina/belmond-villa-sant-andrea/weddings"},
+ {n:"Torre di Scopello",imgs:["https://www.lalista.com/wp-content/uploads/2026/09/Torre_di_scopello_Sicily_wedding_venue_Marco_torcivia43-scaled.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/Torre_di_scopello_Sicily_wedding_venue_Marco_torciviaIMG_3742.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/Torre_di_scopello_Sicily_wedding_venue_Marco_torcivia1.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/Torre_di_scopello_Sicily_wedding_venue_Marco_torcivia4-scaled.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/Torre_di_scopello_Sicily_wedding_venueIMG_4571.jpg", "https://www.lalista.com/wp-content/uploads/2026/09/Torre_di_scopello_Sicily_wedding_venueIMG_4572-2.jpg"],gr:"4.2",gc:"370",web:"https://www.torrediscopello.com",c:"Italy",w:"Scopello, Sicily",reg:2,lat:38.072,lon:12.82,s:"tower",g:"Ask",sl:"Small",sn:4,p:"€9k day",t:"A historic tower above the famous Faraglioni sea stacks, booked for the whole day with no other guests. Two villas for the wedding night.",fit:"Most dramatic view. Guests stay in nearby towns.",air:"Palermo",u:"https://www.lalista.com/venues/sicily/torre-di-scopello"},
+ {n:"La Collina dei Nebrodi",imgs:["https://images.squarespace-cdn.com/content/v1/5fad6f1d211ab272dad021a6/23545b85-567f-4078-b275-188724f50cfc/KS2026-06-26.jpg", "https://images.squarespace-cdn.com/content/v1/5fad6f1d211ab272dad021a6/5c8122b8-afd1-4c8f-bf38-197194ae78a3/KS2026-06-26.F6-4.jpg", "https://images.squarespace-cdn.com/content/v1/5fad6f1d211ab272dad021a6/b1e02702-231b-4a8e-86f7-a7f3d2f2aba7/KS2026-06-26.F5-8.jpg", "https://images.squarespace-cdn.com/content/v1/5fad6f1d211ab272dad021a6/ef149b8d-f1c7-4f36-b4ee-d5392f1f2191/KS2026-06-26-377.jpg", "https://images.squarespace-cdn.com/content/v1/5fad6f1d211ab272dad021a6/42760189-f5f0-4baf-a935-d5f28c675e26/KS2026-06-26-373.jpg", "https://images.squarespace-cdn.com/content/v1/5fad6f1d211ab272dad021a6/e5457c90-281a-4f02-8f2c-64e9a062d65c/KS2026-06-26-3.jpg"],web:"",c:"Italy",w:"Nebrodi coast, Sicily",reg:2,lat:38.06,lon:14.6,s:"villa",g:"60",sl:"22–26",sn:24,p:"€5–10k",t:"Family-run exclusive-use villa in the hills with a pine grove ceremony spot and views over the coast and Aeolian Islands. About 15 minutes to the beach.",fit:"Sized almost exactly for 60.",air:"Catania or Palermo",u:"https://www.lalista.com/venues/sicily/la-collina-dei-nebrodi"},
+ {n:"Torri e Merli",imgs:["https://cdn.webhotelier.net/photos/w=1920/torriemerl/L214697.jpg"],gr:"4.4",gc:"112",web:"",c:"Greece",w:"Lakka, Paxos",reg:4,lat:39.229,lon:20.141,s:"olive",g:"Ask",sl:"Small hotel",sn:20,p:"Ask",t:"A restored Venetian manor among ancient olive groves, with gardens, a pool and breakfast under the pergola.",fit:"Ask about exclusive use. Book villas nearby for the rest.",air:"Corfu + ferry",u:""},
+ {n:"PaxosBlue Suites and Villas",imgs:["https://assets.builderassets.com/site-media/123/gap_0506-1-1920x1280.jpg?format=jpg&quality=80&width=720&height=760&mode=crop", "https://assets.builderassets.com/site-media/123/ak4_0026-1920x1278.jpg?format=jpg&quality=80&width=720&height=760&mode=crop"],gr:"4.5",gc:"73",web:"https://www.paxosblue.com/weddings-in-paxos/",c:"Greece",w:"Gaios, Paxos",reg:4,lat:39.205,lon:20.188,s:"olive",g:"20–60",sl:"Suites + villas",sn:30,p:"Ask",t:"Olive trees, stone terraces and a 180-degree sea view, plus its own little beach. Does symbolic ceremonies, catering included.",fit:"60 is their maximum, so check it doesn't feel tight.",air:"Corfu + ferry",u:"https://www.paxosblue.com/weddings-in-paxos/"}
+];
+let fav=new Set();
+try{fav=new Set(JSON.parse(localStorage.getItem('wv-fav')||'[]'))}catch(e){}
+const save=()=>{try{localStorage.setItem('wv-fav',JSON.stringify([...fav]))}catch(e){}};
+let filter='all';
+
+const scene=(v,i)=>{
+ const id='g'+i,sun=['#ffd36b','#ffc93c','#ffb84a'][i%3];
+ const m={
+  cliff:`<path d="M0 70 L58 52 L96 60 L120 104 L0 104Z" fill="#c9a77a"/><path d="M0 70 L58 52 L66 56 L8 76Z" fill="#e7cfa6"/><path d="M96 60 L120 104 L110 104 L90 66Z" fill="#a4835a"/><rect x="34" y="40" width="22" height="14" rx="2" fill="#fff"/><path d="M32 41 L45 33 L58 41Z" fill="#d97b5b"/>`,
+  olive:`<path d="M0 82 Q80 58 170 78 T320 76 L320 104 L0 104Z" fill="#9fb27a"/><g fill="#6f8a55"><circle cx="60" cy="68" r="11"/><circle cx="72" cy="64" r="9"/><circle cx="150" cy="72" r="10"/><circle cx="162" cy="69" r="8"/><circle cx="250" cy="70" r="11"/><circle cx="262" cy="66" r="9"/></g><g fill="#5a4a3a"><rect x="65" y="74" width="3" height="10"/><rect x="155" y="78" width="3" height="9"/><rect x="255" y="76" width="3" height="10"/></g>`,
+  villa:`<path d="M0 84 Q160 66 320 84 L320 104 L0 104Z" fill="#b8c48f"/><rect x="120" y="58" width="80" height="28" fill="#fffaf2"/><path d="M114 60 L160 42 L206 60Z" fill="#d97b5b"/><g fill="#7aa6d6"><rect x="132" y="66" width="10" height="12"/><rect x="155" y="66" width="10" height="12"/><rect x="178" y="66" width="10" height="12"/></g><circle cx="236" cy="74" r="10" fill="#6f8a55"/><rect x="234" y="80" width="3" height="8" fill="#5a4a3a"/>`,
+  tower:`<path d="M170 104 L196 66 L250 62 L276 104Z" fill="#c9a77a"/><rect x="214" y="30" width="22" height="36" fill="#e7cfa6"/><rect x="211" y="26" width="28" height="6" fill="#c9a77a"/><path d="M40 104 L52 74 L64 104Z M80 104 L88 84 L96 104Z" fill="#a4835a"/>`,
+  beach:`<path d="M0 92 Q160 80 320 92 L320 104 L0 104Z" fill="#f2dcae"/><path d="M220 72 Q240 58 260 72Z" fill="#ff7a8a"/><rect x="239" y="72" width="2" height="22" fill="#5a4a3a"/><rect x="40" y="56" width="70" height="30" fill="#fffaf2"/><g fill="#7aa6d6"><rect x="50" y="64" width="10" height="12"/><rect x="70" y="64" width="10" height="12"/><rect x="90" y="64" width="10" height="12"/></g><path d="M36 58 L75 46 L114 58Z" fill="#d97b5b"/>`
+ }[v.s];
+ return `<svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfd8f5"/><stop offset="1" stop-color="#f6dcc8"/></linearGradient><linearGradient id="${id}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a86d4"/><stop offset="1" stop-color="#1f5aa0"/></linearGradient></defs><rect width="320" height="104" fill="url(#${id}s)"/><circle cx="${90+(i*53)%160}" cy="38" r="16" fill="${sun}"/><rect y="96" width="320" height="64" fill="url(#${id}w)"/><path d="M0 112 Q40 108 80 112 T160 112 T240 112 T320 112" stroke="#ffffff55" stroke-width="2" fill="none"/><path d="M0 130 Q40 126 80 130 T160 130 T240 130 T320 130" stroke="#ffffff33" stroke-width="2" fill="none"/>${m}</svg>`;
+};
+
+const maps=u=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(u);
+const show=v=>filter==='all'||filter===v.c||(filter==='big'&&v.sn>=40)||(filter==='fav'&&fav.has(v.n));
+
+let db=null,assets=null,photos={},busy='',openMap=-1;
+const key=v=>v.n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const gallery=(v,i)=>{const up=(photos[key(v)]||[]).map(id=>({u:'/_blob/'+encodeURIComponent(id),id})),rem=(v.imgs||[]).map(u=>({u}));const all=[...up,...rem];
+ if(!all.length)return scene(v,i);
+ return scene(v,i)+`<div class="gal">${all.map(p=>`<figure><img src="${p.u}" alt="${v.n} photo" referrerpolicy="no-referrer" onload="window.__ph&&__ph(1)" onerror="window.__ph&&__ph(0);const f=this.parentNode,g=f.parentNode;f.remove();if(!g.children.length)g.remove()">${p.id&&assets?`<button class="rm" data-k="${key(v)}" data-id="${p.id}" aria-label="Remove photo">×</button>`:''}</figure>`).join('')}</div>`};
+const shrink=f=>new Promise(res=>{if(!/^image\/(jpeg|png|webp|heic)/.test(f.type)){res(f);return}
+ const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const m=1800,sc=Math.min(1,m/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>res(b||f),'image/jpeg',.85)};im.onerror=()=>{URL.revokeObjectURL(u);res(f)};im.src=u});
+const picker=document.createElement('input');picker.type='file';picker.accept='image/*';picker.multiple=true;picker.style.display='none';document.body.appendChild(picker);
+let pickKey='';
+picker.addEventListener('change',async()=>{const files=[...picker.files];picker.value='';if(!files.length||!pickKey||!assets||!db)return;
+ const k=pickKey;busy=k;render();const ids=[...(photos[k]||[])];
+ try{for(const f of files){const b=await shrink(f);const r=await assets.upload(b);ids.push(r.id)}
+  await db.doc('photos/'+k).set({ids});}
+ catch(err){showMsg('Couldn\'t upload that one. Try a smaller image.')}
+ busy='';render()});
+const showMsg=t=>{const n=document.getElementById('count');n.textContent=t;setTimeout(render,3500)};
+const render=()=>{
+ const list=V.map((v,i)=>({v,i})).filter(o=>show(o.v));
+ document.getElementById('count').textContent=list.length+' of '+V.length+' venues';
+ document.getElementById('grid').innerHTML=list.length?list.map(({v,i})=>{
+  const R=regions[v.reg];
+  return `<article class="card" id="v${i}"><div class="pc">${gallery(v,i)}<span class="num">${i+1}</span>${((photos[key(v)]||[]).length+(v.imgs||[]).length)>1?`<span class="pcount">${(photos[key(v)]||[]).length+(v.imgs||[]).length} photos · swipe</span>`:''}${assets?`<button class="addp" data-k="${key(v)}" ${busy===key(v)?'disabled':''}>${busy===key(v)?'Uploading…':'+ Add photos'}</button>`:''}<button class="heart" data-n="${v.n}" aria-label="${fav.has(v.n)?'Remove':'Save'} ${v.n}" aria-pressed="${fav.has(v.n)}">${fav.has(v.n)?'♥':'♡'}</button></div>
+  <div class="body"><div class="where">${v.w} · ${v.c}</div><h3>${v.n}</h3>${v.gr?`<div class="rate"><i>★</i> <b>${v.gr}</b> on Google · ${Number(v.gc).toLocaleString()} reviews</div>`:''}
+  <div class="facts"><div>Guests<b>${v.g}</b></div><div>Sleeps<b>${v.sl}</b></div><div>From<b>${v.p}</b></div></div>
+  <p>${v.t}</p><div class="fit">${v.fit}</div>
+  ${openMap===i?`<iframe class="gmap" title="Map of ${v.n}" loading="lazy" src="https://maps.google.com/maps?q=${v.lat},${v.lon}&z=12&output=embed"></iframe>`:''}<div class="where">Sea ${R.sep}° Sep · ${R.oct}° Oct · Fly into ${v.air}</div>
+  <div class="links"><a class="main" href="${v.web||('https://www.google.com/search?q='+encodeURIComponent(v.n+' '+v.w+' official site'))}" target="_blank" rel="noopener">Website</a><button class="onmap" data-i="${i}" aria-expanded="${openMap===i}">${openMap===i?'Hide map':'Map'}</button><a href="${maps(v.n+' '+v.w)}" target="_blank" rel="noopener">Google photos</a>${v.u&&v.u!==v.web?`<a href="${v.u}" target="_blank" rel="noopener">Listing</a>`:''}</div></div></article>`}).join(''):`<div class="empty">Nothing saved yet. Tap the heart on any venue.</div>`;
+};
+
+let geo=null,view=null,sel=-1;
+const B={all:[-1,22,35.6,45.4],France:[4.6,8.1,42.5,44.2],Italy:[11.8,19.4,36.6,42.2],Spain:[1.3,4.4,38.6,40.5],Greece:[18.8,21.6,38.3,40.3]};
+const decodeGeo=j=>{const sc=j.UTF8Scale||1024;
+ const dec=(c,o)=>{if(typeof c!=='string')return c;const r=[];let px=o[0],py=o[1];for(let i=0;i<c.length;i+=2){let x=c.charCodeAt(i)-64,y=c.charCodeAt(i+1)-64;x=(x>>1)^(-(x&1));y=(y>>1)^(-(y&1));x+=px;y+=py;px=x;py=y;r.push([x/sc,y/sc])}return r};
+ j.features.forEach(f=>{const g=f.geometry,o=g.encodeOffsets||[];
+  if(g.type==='Polygon')g.coordinates=g.coordinates.map((c,i)=>dec(c,o[i]));
+  else if(g.type==='MultiPolygon')g.coordinates=g.coordinates.map((pp,i)=>pp.map((c,k)=>dec(c,(o[i]||[])[k])))});
+ return j};
+const drawMap=()=>{
+ const s=document.getElementById('map'),W=s.clientWidth,H=s.clientHeight,sm=W<520;
+ if(!W||!H)return;
+ const b=view||B[filter]||B.all,k=Math.cos(40*Math.PI/180);
+ const scl=Math.min(W/((b[1]-b[0])*k),H/(b[3]-b[2]));
+ const cx=(b[0]+b[1])/2,cy=(b[2]+b[3])/2;
+ const X=lo=>W/2+(lo-cx)*k*scl,Y=la=>H/2-(la-cy)*scl;
+ let g='';
+ if(geo){
+  const lo0=cx-W/2/(k*scl)-1,lo1=cx+W/2/(k*scl)+1,la0=cy-H/2/scl-1,la1=cy+H/2/scl+1;let d='';
+  geo.features.forEach(f=>{const gm=f.geometry;const polys=gm.type==='Polygon'?[gm.coordinates]:gm.type==='MultiPolygon'?gm.coordinates:[];
+   polys.forEach(poly=>poly.forEach(ring=>{if(!ring.length)return;let a=1e9,bb=-1e9,c=1e9,e=-1e9;
+    for(const q of ring){if(q[0]<a)a=q[0];if(q[0]>bb)bb=q[0];if(q[1]<c)c=q[1];if(q[1]>e)e=q[1]}
+    if(bb<lo0||a>lo1||e<la0||c>la1)return;
+    d+='M'+ring.map(q=>X(q[0]).toFixed(1)+' '+Y(q[1]).toFixed(1)).join('L')+'Z'}))});
+  g+=`<path d="${d}" fill="var(--land)" stroke="var(--edge)" stroke-width="1.2" stroke-linejoin="round"/>`;
+ }
+ if(!view&&(filter==='all'||filter==='big'||filter==='fav')){
+  const labels=[["Côte d'Azur",6.2,44.75],["Mallorca",2.9,40.25],["Puglia",17.6,41.5],["Sicily",14.2,36.9],["Paxos",20.3,39.75]];
+  g+=labels.map(([t,lo,la])=>`<text x="${X(lo)}" y="${Y(la)}" text-anchor="middle" font-family="Fraunces,serif" font-size="${sm?13:17}" fill="#0f2238" stroke="#ffffffaa" stroke-width="3" paint-order="stroke">${t}</text>`).join('');
+ }
+ const r=sm?10:13,pts=V.map((v,i)=>({v,i,x:X(v.lon),y:Y(v.lat)})).filter(p=>view||show(p.v));
+ pts.forEach((p,n)=>{for(let j=0;j<n;j++){const q=pts[j];if(Math.hypot(p.x-q.x,p.y-q.y)<r*2){p.x+=r*1.9}}});
+ g+=pts.map(p=>{const on=p.i===sel,rr=on?r+4:r;return `<g class="pin" tabindex="0" role="button" aria-label="${p.i+1}. ${p.v.n}" data-i="${p.i}"><circle cx="${p.x}" cy="${p.y}" r="${rr}" fill="${on?'#ffb000':fav.has(p.v.n)?'#d2456b':'#1f63b5'}" stroke="#fff" stroke-width="2.5" style="transform-box:fill-box;transform-origin:center"/><text x="${p.x}" y="${p.y+4.5}" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600" font-size="${sm?11:13}" fill="#fff" pointer-events="none">${p.i+1}</text>${on?`<text x="${p.x}" y="${p.y-rr-8}" text-anchor="middle" font-family="Fraunces,serif" font-size="${sm?14:18}" fill="#0f2238" stroke="#fff" stroke-width="4" paint-order="stroke">${p.v.n}</text>`:''}</g>`}).join('');
+ s.innerHTML=g;
+ document.getElementById('reset').hidden=!view;
+};
+const zoomTo=i=>{const v=V[i];view=[v.lon-1.3,v.lon+1.3,v.lat-0.85,v.lat+0.85];sel=i;drawMap();document.getElementById('chart').scrollIntoView({block:'center'})};
+document.getElementById('reset').addEventListener('click',()=>{view=null;sel=-1;drawMap()});
+document.getElementById('temps').innerHTML=regions.map(R=>`<div class="trow"><b><span>${R.r}</span><span>${R.sep}° / ${R.oct}°</span></b><div class="bar"><i style="width:${(R.sep-15)/12*100}%"></i><s style="width:${(R.oct-15)/12*100}%"></s></div></div>`).join('');
+
+const go=i=>{
+ if(!show(V[i])){filter='all';document.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f==='all'));render()}
+ const el=document.getElementById('v'+i);if(!el)return;
+ el.scrollIntoView({block:'start'});el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1600);
+};
+document.getElementById('map').addEventListener('click',e=>{const p=e.target.closest('.pin');if(p)go(+p.dataset.i)});
+document.getElementById('map').addEventListener('keydown',e=>{const p=e.target.closest('.pin');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();go(+p.dataset.i)}});
+document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;filter=b.dataset.f;view=null;sel=-1;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));render();drawMap()});
+document.getElementById('grid').addEventListener('click',async e=>{const a=e.target.closest('.addp');if(a){pickKey=a.dataset.k;picker.click();return}
+ const x=e.target.closest('.rm');if(x){const k=x.dataset.k,id=x.dataset.id;const ids=(photos[k]||[]).filter(q=>q!==id);try{await db.doc('photos/'+k).set({ids});assets.delete(id).catch(()=>{})}catch(err){showMsg('Couldn\'t remove that photo.')}return}
+ const m=e.target.closest('.onmap');if(m){const i=+m.dataset.i;openMap=openMap===i?-1:i;render();sel=openMap;drawMap();return}const h=e.target.closest('.heart');if(!h)return;const n=h.dataset.n;fav.has(n)?fav.delete(n):fav.add(n);save();render();drawMap()});
+
+let phOk=0,phBad=0;window.__ph=ok=>{ok?phOk++:phBad++};setTimeout(()=>{if(!phOk&&phBad)document.getElementById('blocked').hidden=false},6000);
+render();
+const mapRO=new ResizeObserver(drawMap);mapRO.observe(document.getElementById('map'));
+window.echarts={registerMap:(n,gj)=>{try{geo=decodeGeo(gj)}catch(err){geo=null}}};
+const geoS=document.createElement('script');geoS.src='https://cdn.jsdelivr.net/npm/echarts@4.9.0/map/js/world.js';geoS.onload=()=>drawMap();document.body.appendChild(geoS);
+(async()=>{if(!window.claude||!claude.use)return;
+ try{const r=await Promise.all([claude.use('db'),claude.use('assets')]);db=r[0];assets=r[1]}catch(err){}
+ if(!db){assets=null;render();return}
+ const tm=setTimeout(()=>showMsg('Photos are taking a while to load…'),10000);
+ db.collection('photos').onSnapshot(s=>{if(!s.metadata.fromCache)clearTimeout(tm);const o={};s.docs.forEach(d=>{const x=d.data()||{};if(Array.isArray(x.ids))o[d.id]=x.ids.filter(q=>typeof q==='string')});photos=o;render()},()=>clearTimeout(tm));
+ render()})();
+
+}
+</script>
+</body>
+</html>
