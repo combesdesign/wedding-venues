@@ -65,6 +65,10 @@ h1{font-size:clamp(32px,5vw,50px)}
 .gmap{width:100%;height:220px;border:0;border-radius:12px;display:block}
 .trip{display:grid;gap:8px;font-size:14px;background:var(--sea2);border-radius:10px;padding:10px 12px}.trip b{display:block;font-size:13px;color:var(--sea)}
 .tags{display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--line)}.tag.ok{background:#dff3e6;color:#1d6b3a}.tag.no{background:#fde4e4;color:#9b2c2c}
+.planners{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px;margin-top:16px}
+.pl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.pl h4{margin:0;font:600 18px Fraunces,Georgia,serif}.pl .where{font-size:13px}.pl p{margin:0;font-size:14px}
+.pl a{align-self:flex-start;margin-top:4px;min-height:40px;display:inline-grid;place-items:center;padding:0 14px;border-radius:10px;border:1.5px solid var(--sea);color:var(--sea);font-weight:600;font-size:14px;text-decoration:none}
 .rate{font-size:14px;color:var(--soft)}.rate b{color:var(--ink)}.rate i{font-style:normal;color:#f2a900}
 .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
 .where{font-size:13px;color:var(--soft)}
@@ -106,6 +110,7 @@ h3{font-size:24px}
 <span class="count" id="count"></span>
 </div>
 <div class="grid" id="grid"></div>
+<section id="planners" style="margin-top:44px"><h2 style="font-size:clamp(26px,4vw,36px)">Wedding planners</h2><p class="lede" style="margin-top:8px">In case you want one. Most of these came up behind real weddings at venues on this list.</p><div class="planners" id="plist"></div></section>
 <p class="note">Prices are starting figures from venue listings and will change for 2027. "Ask" means the venue doesn't publish it. Photos are shown straight from each venue's own website or listing. Ratings are from Google, November 2026. Flight routes are typical options, so check current schedules and fares. Website opens the venue's own site. Where we couldn't confirm one, it opens a search for it instead.</p>
 </div></main>
 
@@ -244,6 +249,8 @@ document.getElementById('grid').addEventListener('click',async e=>{const a=e.tar
  const m=e.target.closest('.onmap');if(m){const i=+m.dataset.i;openMap=openMap===i?-1:i;render();sel=openMap;drawMap();return}const h=e.target.closest('.heart');if(!h)return;const n=h.dataset.n;fav.has(n)?fav.delete(n):fav.add(n);save();render();drawMap()});
 
 let phOk=0,phBad=0;window.__ph=ok=>{ok?phOk++:phBad++};setTimeout(()=>{if(!phOk&&phBad)document.getElementById('blocked').hidden=false},6000);
+const PL=[{"n": "Chloe Alise Events", "a": "Texas based, works worldwide", "d": "Planning, design and production. Has South of France weddings in her portfolio.", "v": "Any", "u": "https://www.chloealise.com"}, {"n": "Paxos Weddings", "a": "Gaios, Paxos", "d": "The local planner on Paxos. Does anything from just the ceremony through to full service. enquiries@paxosweddings.co.uk · +30 697 682 3059", "v": "Torri e Merli, PaxosBlue", "u": "https://www.paxosweddings.com"}, {"n": "Phaedra Events", "a": "Greece", "d": "Planned a destination wedding on Paxos with the reception at Erimitis.", "v": "Paxos, Corfu", "u": "https://www.phaedraevents.gr"}, {"n": "Momento Mio", "a": "Provence", "d": "Planned a sea-view wedding at Domaine de Canaille.", "v": "Domaine de Canaille, Château de Cassis", "u": ""}, {"n": "D-Day Wedding Planner Provence", "a": "Provence", "d": "Planned a cliffside wedding at Domaine de Canaille. On Instagram as @ddayweddingplannerprovence.", "v": "Domaine de Canaille, Château de Cassis, Rocabella", "u": "https://www.instagram.com/ddayweddingplannerprovence/"}, {"n": "L&J Wedding Planner", "a": "French Riviera", "d": "Riviera specialists who publish a guide to the best venues on the coast.", "v": "Riviera venues", "u": "https://landj-weddingplanner.com"}, {"n": "Fervenza", "a": "French Riviera", "d": "Very high end. Their Riviera packages start around €220k, so likely more than you need.", "v": "Riviera venues", "u": "https://www.fervenza.fr"}, {"n": "Marina Guccione", "a": "Sicily", "d": "Planner behind weddings at Torre di Scopello.", "v": "Torre di Scopello, Palermo coast", "u": ""}, {"n": "LaLindi", "a": "Sicily", "d": "La Lista trusted planner. Designed a wedding at Tonnara di Scopello with al fresco dining under fairy lights.", "v": "Tonnara di Scopello, Palermo coast", "u": ""}, {"n": "Isla & Smith Bespoke Events", "a": "Destination", "d": "Planned a wedding weekend at Tonnara di Scopello.", "v": "Tonnara di Scopello", "u": ""}, {"n": "Mailaenea Events", "a": "Sicily", "d": "Writes about and plans weddings at Villa Igiea in Palermo.", "v": "Villa Igiea", "u": "https://mailaeneaevents.com"}, {"n": "Exclusive Italy Weddings", "a": "Italy, incl. Sicily and Puglia", "d": "Italy-wide planner with venue guides for Sicily and Puglia.", "v": "Sicily, Puglia", "u": "https://www.exclusiveitalyweddings.com"}];
+document.getElementById('plist').innerHTML=PL.map(x=>`<div class="pl"><h4>${x.n}</h4><div class="where">${x.a} · Good for: ${x.v}</div><p>${x.d}</p><a href="${x.u||('https://www.google.com/search?q='+encodeURIComponent(x.n+' wedding planner'))}" target="_blank" rel="noopener">${x.u?'Website':'Find them'}</a></div>`).join('');
 render();
 const mapRO=new ResizeObserver(drawMap);mapRO.observe(document.getElementById('map'));
 window.echarts={registerMap:(n,gj)=>{try{geo=decodeGeo(gj)}catch(err){geo=null}}};
