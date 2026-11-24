@@ -107,9 +107,9 @@ h3{font-size:24px}
 <button class="chip" data-f="Italy" aria-pressed="false">Italy</button>
 <button class="chip" data-f="Greece" aria-pressed="false">Greece</button>
 <button class="chip" data-f="budget" aria-pressed="false">Fits A$60k</button>
-<button class="chip" data-f="pool" aria-pressed="false">Has pool</button>
 <button class="chip" data-f="big" aria-pressed="false">Sleeps 40+</button>
 <button class="chip" data-f="fav" aria-pressed="false">♥ Saved</button>
+<button class="chip" data-f="nopool" aria-pressed="false">No pool</button>
 <span class="count" id="count"></span>
 <p class="note" style="width:100%;margin:4px 0 0">"Your cost" is a rough estimate for 60 guests over 3 nights: venue hire plus food and drink (about €225–240 a head across the weekend, local wine), less A$1,000 from each guest where rooms are included. A$1.65 to the euro.</p>
 </div>
@@ -181,7 +181,7 @@ const scene=(v,i)=>{
 };
 
 const maps=u=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(u);
-const show=v=>filter==='all'||filter===v.c||(filter==='big'&&v.sn>=40)||(filter==='pool'&&v.pool===true)||(filter==='budget'&&v.yc&&v.yc<=60)||(filter==='fav'&&fav.has(v.n));
+const show=v=>{if(filter==='nopool')return v.pool!==true;if(v.pool!==true&&filter!=='fav')return false;return filter==='all'||filter===v.c||(filter==='big'&&v.sn>=40)||(filter==='pool'&&v.pool===true)||(filter==='budget'&&v.yc&&v.yc<=60)||(filter==='fav'&&fav.has(v.n))};
 
 let db=null,assets=null,photos={},busy='',openMap=-1;
 const key=v=>v.n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -237,7 +237,7 @@ const drawMap=()=>{
     d+='M'+ring.map(q=>X(q[0]).toFixed(1)+' '+Y(q[1]).toFixed(1)).join('L')+'Z'}))});
   g+=`<path d="${d}" fill="var(--land)" stroke="var(--edge)" stroke-width="1.2" stroke-linejoin="round"/>`;
  }
- if(!view&&(filter==='all'||filter==='big'||filter==='fav'||filter==='pool'||filter==='budget'||filter==='Australia')){
+ if(!view&&(filter==='all'||filter==='big'||filter==='fav'||filter==='nopool'||filter==='budget'||filter==='Australia')){
   const labels=[["Côte d'Azur",6.2,44.75],["Puglia",17.6,41.5],["Sicily",14.2,36.9],["Corfu & Paxos",20.6,39.95],["Corsica",9.0,42.35],["Crete",25.4,34.95]];
   g+=labels.map(([t,lo,la])=>`<text x="${X(lo)}" y="${Y(la)}" text-anchor="middle" font-family="Fraunces,serif" font-size="${sm?13:17}" fill="#0f2238" stroke="#ffffffaa" stroke-width="3" paint-order="stroke">${t}</text>`).join('');
  }
