@@ -49,7 +49,7 @@ h1{font-size:clamp(32px,5vw,50px)}
 .count{margin-left:auto;color:var(--soft);font-size:14px}
 .clist{display:flex;flex-wrap:wrap;gap:8px;width:100%;padding-top:10px;border-top:1px solid var(--line)}
 .chip.c-like[aria-pressed=true]{background:#d2456b;border-color:#d2456b}.chip.c-maybe[aria-pressed=true]{background:#c58a00;border-color:#c58a00}.chip.c-no[aria-pressed=true]{background:#6b6f76;border-color:#6b6f76}.chip.share{margin-left:auto;border-style:dashed}
-.stat{display:flex;gap:6px;margin:10px 0 4px}.stat button{flex:1;min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:600 14px Inter,sans-serif;cursor:pointer}
+.stat{position:absolute;right:10px;top:8px;display:flex;gap:6px;z-index:2}.stat button{width:44px;height:44px;border:0;border-radius:50%;background:#ffffffd9;font:700 21px Inter,sans-serif;line-height:1;cursor:pointer;box-shadow:0 1px 4px #0002}.stat .s-like{color:#d2456b}.stat .s-maybe{color:#c58a00}.stat .s-no{color:#6b6f76}.stat button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 .stat button[aria-pressed=true].s-like{background:#d2456b;border-color:#d2456b;color:#fff}.stat button[aria-pressed=true].s-maybe{background:#c58a00;border-color:#c58a00;color:#fff}.stat button[aria-pressed=true].s-no{background:#6b6f76;border-color:#6b6f76;color:#fff}
 .sbadge{position:absolute;right:10px;top:10px;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;color:#fff}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:22px}
@@ -175,7 +175,7 @@ try{st=JSON.parse(localStorage.getItem('wv-st')||'null')||{};if(!localStorage.ge
 try{const q=new URLSearchParams(location.search).get('l');if(q){Object.assign(st,JSON.parse(decodeURIComponent(escape(atob(q.replace(/-/g,'+').replace(/_/g,'/'))))));history.replaceState(null,'',location.pathname)}}catch(e){}
 const save=()=>{try{localStorage.setItem('wv-st',JSON.stringify(st))}catch(e){}};
 const fav={has:n=>st[n]==='like'};
-const SL={like:'♥ Love',maybe:'Maybe',no:'Not for us'},SC={like:'#d2456b',maybe:'#c58a00',no:'#6b6f76'};
+const SI={like:'♥',maybe:'?',no:'✕'},SL={like:'Love',maybe:'Maybe',no:'Not for us'},SC={like:'#d2456b',maybe:'#c58a00',no:'#6b6f76'};
 let filter='all';
 
 const scene=(v,i)=>{
@@ -212,11 +212,11 @@ const showMsg=t=>{const n=document.getElementById('count');n.textContent=t;setTi
 const render=()=>{
  const list=V.map((v,i)=>({v,i})).filter(o=>show(o.v));if(filter==='budget')list.sort((a,b)=>a.v.yc-b.v.yc);
  document.getElementById('count').textContent=list.length+' of '+V.length+' venues';
- const nn=k=>V.filter(v=>k==='todo'?!st[v.n]&&v.pool===true:st[v.n]===k).length;document.querySelectorAll('.clist .chip[data-f]').forEach(b=>{const k=b.dataset.f;b.textContent=({like:'♥ Love',maybe:'Maybe',todo:'To sort',no:'Not for us'})[k]+' ('+nn(k)+')'});
+ const nn=k=>V.filter(v=>k==='todo'?!st[v.n]&&v.pool===true:st[v.n]===k).length;document.querySelectorAll('.clist .chip[data-f]').forEach(b=>{const k=b.dataset.f;b.textContent=({like:'♥ Love',maybe:'? Maybe',todo:'To sort',no:'✕ Not for us'})[k]+' ('+nn(k)+')'});
  document.getElementById('grid').innerHTML=list.length?list.map(({v,i})=>{
   const R=regions[v.reg];
-  return `<article class="card" id="v${i}"><div class="pc">${gallery(v,i)}${((photos[key(v)]||[]).length+(v.imgs||[]).length)>1?`<button class="gnav prev" aria-label="Previous photo">‹</button><button class="gnav next" aria-label="Next photo">›</button>`:''}<span class="num">${i+1}</span>${((photos[key(v)]||[]).length+(v.imgs||[]).length)>1?`<span class="pcount">${(photos[key(v)]||[]).length+(v.imgs||[]).length} photos · swipe</span>`:''}${assets?`<button class="addp" data-k="${key(v)}" ${busy===key(v)?'disabled':''}>${busy===key(v)?'Uploading…':'+ Add photos'}</button>`:''}${st[v.n]?`<span class="sbadge" style="background:${SC[st[v.n]]}">${SL[st[v.n]]}</span>`:''}</div>
-  <div class="body"><div class="where">${v.w} · ${v.c}</div><h3>${v.n}</h3><div class="stat" role="group" aria-label="Our verdict on ${v.n}">${['like','maybe','no'].map(k=>`<button class="s-${k}" data-n="${v.n}" data-s="${k}" aria-pressed="${st[v.n]===k}">${SL[k]}</button>`).join('')}</div>${v.gr?`<div class="rate"><i>★</i> <b>${v.gr}</b> on Google · ${Number(v.gc).toLocaleString()} reviews</div>`:''}
+  return `<article class="card" id="v${i}"><div class="pc">${gallery(v,i)}${((photos[key(v)]||[]).length+(v.imgs||[]).length)>1?`<button class="gnav prev" aria-label="Previous photo">‹</button><button class="gnav next" aria-label="Next photo">›</button>`:''}<span class="num">${i+1}</span>${((photos[key(v)]||[]).length+(v.imgs||[]).length)>1?`<span class="pcount">${(photos[key(v)]||[]).length+(v.imgs||[]).length} photos · swipe</span>`:''}${assets?`<button class="addp" data-k="${key(v)}" ${busy===key(v)?'disabled':''}>${busy===key(v)?'Uploading…':'+ Add photos'}</button>`:''}<div class="stat" role="group" aria-label="Our verdict on ${v.n}">${['like','maybe','no'].map(k=>`<button class="s-${k}" data-n="${v.n}" data-s="${k}" aria-pressed="${st[v.n]===k}" aria-label="${SL[k]}" title="${SL[k]}">${SI[k]}</button>`).join('')}</div></div>
+  <div class="body"><div class="where">${v.w} · ${v.c}</div><h3>${v.n}</h3>${v.gr?`<div class="rate"><i>★</i> <b>${v.gr}</b> on Google · ${Number(v.gc).toLocaleString()} reviews</div>`:''}
   <div class="facts"><div>Guests<b>${v.g}</b></div><div>Sleeps<b>${v.sl}</b></div><div>From<b>${v.p}</b></div></div>
   ${v.yc?`<div class="yc"><b>Your cost ~A$${v.yc}k</b><span>venue + food &amp; drink for 60, guests pay ~A$1,000 each for rooms</span></div>`:''}<div class="tags">${v.pool===true?'<span class="tag ok">Pool</span>':v.pool===false?'<span class="tag no">No pool</span>':'<span class="tag">Pool: ask</span>'}<span class="tag ok">Outdoor dinner</span></div><p>${v.t}</p><div class="fit">${v.fit}</div>
   ${openMap===i?`<iframe class="gmap" title="Map of ${v.n}" loading="lazy" src="https://maps.google.com/maps?q=${v.lat},${v.lon}&z=12&output=embed"></iframe>`:''}<div class="where">Sea ${R.sep}° Sep · ${R.oct}° Oct</div>${v.fs?`<div class="trip"><div><b>From Sydney</b>${v.fs}</div><div><b>From London</b>${v.fl}</div></div>`:''}
