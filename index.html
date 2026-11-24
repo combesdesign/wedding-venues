@@ -116,7 +116,6 @@ h3{font-size:24px}
 <button class="chip" data-f="nopool" aria-pressed="false">No pool</button>
 <span class="clist"><button class="chip c-like" data-f="like" aria-pressed="false">♥ Love</button>
 <button class="chip c-maybe" data-f="maybe" aria-pressed="false">Maybe</button>
-<button class="chip" data-f="todo" aria-pressed="false">To sort</button>
 <button class="chip c-no" data-f="no" aria-pressed="false">Not for us</button>
 <button class="chip share" id="share" type="button">Share our list</button></span>
 <span class="count" id="count"></span>
@@ -191,7 +190,7 @@ const scene=(v,i)=>{
 };
 
 const maps=u=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(u);
-const show=v=>{if(filter==='like'||filter==='maybe'||filter==='no')return st[v.n]===filter;if(filter==='todo')return !st[v.n]&&v.pool===true;if(st[v.n]==='no')return false;if(filter==='nopool')return v.pool!==true;if(v.pool!==true)return false;return filter==='all'||filter===v.c||(filter==='big'&&v.sn>=40)||(filter==='pool'&&v.pool===true)||(filter==='budget'&&v.yc&&v.yc<=60)||(filter==='fav'&&fav.has(v.n))};
+const show=v=>{if(filter==='like'||filter==='maybe'||filter==='no')return st[v.n]===filter;if(filter==='todo')return !st[v.n]&&v.pool===true;if(st[v.n])return false;if(filter==='nopool')return v.pool!==true;if(v.pool!==true)return false;return filter==='all'||filter===v.c||(filter==='big'&&v.sn>=40)||(filter==='pool'&&v.pool===true)||(filter==='budget'&&v.yc&&v.yc<=60)||(filter==='fav'&&fav.has(v.n))};
 
 let db=null,assets=null,photos={},busy='',openMap=-1;
 const key=v=>v.n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
