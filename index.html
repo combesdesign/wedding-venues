@@ -58,6 +58,7 @@ h1{font-size:clamp(32px,5vw,50px)}
 .gal::-webkit-scrollbar{display:none}
 .gal figure{position:relative;flex:0 0 100%;height:100%;margin:0;scroll-snap-align:start}
 .gal img{width:100%;height:100%;object-fit:cover;display:block;background:var(--sea2)}
+.gnav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:0;background:#ffffffe6;color:#0f2238;font-size:28px;line-height:1;padding-bottom:4px;box-shadow:0 2px 8px #0003;cursor:pointer}.gnav.prev{left:10px}.gnav.next{right:10px}.gnav:focus-visible{outline:3px solid var(--sun)}
 .rm{position:absolute;right:10px;bottom:10px;width:36px;height:36px;border-radius:50%;border:0;background:#000a;color:#fff;font-size:18px;cursor:pointer}
 .pcount{position:absolute;left:52px;top:16px;background:#000a;color:#fff;font-size:13px;padding:3px 9px;border-radius:999px;pointer-events:none}
 .addp{position:absolute;left:12px;bottom:12px;min-height:40px;padding:0 14px;border-radius:999px;border:0;background:#fff;color:#0f2238;font:600 14px Inter,sans-serif;box-shadow:0 2px 6px #0003;cursor:pointer}
@@ -201,7 +202,7 @@ const render=()=>{
  document.getElementById('count').textContent=list.length+' of '+V.length+' venues';
  document.getElementById('grid').innerHTML=list.length?list.map(({v,i})=>{
   const R=regions[v.reg];
-  return `<article class="card" id="v${i}"><div class="pc">${gallery(v,i)}<span class="num">${i+1}</span>${((photos[key(v)]||[]).length+(v.imgs||[]).length)>1?`<span class="pcount">${(photos[key(v)]||[]).length+(v.imgs||[]).length} photos · swipe</span>`:''}${assets?`<button class="addp" data-k="${key(v)}" ${busy===key(v)?'disabled':''}>${busy===key(v)?'Uploading…':'+ Add photos'}</button>`:''}<button class="heart" data-n="${v.n}" aria-label="${fav.has(v.n)?'Remove':'Save'} ${v.n}" aria-pressed="${fav.has(v.n)}">${fav.has(v.n)?'♥':'♡'}</button></div>
+  return `<article class="card" id="v${i}"><div class="pc">${gallery(v,i)}${((photos[key(v)]||[]).length+(v.imgs||[]).length)>1?`<button class="gnav prev" aria-label="Previous photo">‹</button><button class="gnav next" aria-label="Next photo">›</button>`:''}<span class="num">${i+1}</span>${((photos[key(v)]||[]).length+(v.imgs||[]).length)>1?`<span class="pcount">${(photos[key(v)]||[]).length+(v.imgs||[]).length} photos · swipe</span>`:''}${assets?`<button class="addp" data-k="${key(v)}" ${busy===key(v)?'disabled':''}>${busy===key(v)?'Uploading…':'+ Add photos'}</button>`:''}<button class="heart" data-n="${v.n}" aria-label="${fav.has(v.n)?'Remove':'Save'} ${v.n}" aria-pressed="${fav.has(v.n)}">${fav.has(v.n)?'♥':'♡'}</button></div>
   <div class="body"><div class="where">${v.w} · ${v.c}</div><h3>${v.n}</h3>${v.gr?`<div class="rate"><i>★</i> <b>${v.gr}</b> on Google · ${Number(v.gc).toLocaleString()} reviews</div>`:''}
   <div class="facts"><div>Guests<b>${v.g}</b></div><div>Sleeps<b>${v.sl}</b></div><div>From<b>${v.p}</b></div></div>
   ${v.yc?`<div class="yc"><b>Your cost ~A$${v.yc}k</b><span>venue + food &amp; drink for 60, guests pay ~A$1,000 each for rooms</span></div>`:''}<div class="tags">${v.pool===true?'<span class="tag ok">Pool</span>':v.pool===false?'<span class="tag no">No pool</span>':'<span class="tag">Pool: ask</span>'}<span class="tag ok">Outdoor dinner</span></div><p>${v.t}</p><div class="fit">${v.fit}</div>
@@ -256,7 +257,8 @@ const go=i=>{
 document.getElementById('map').addEventListener('click',e=>{const p=e.target.closest('.pin');if(p)go(+p.dataset.i)});
 document.getElementById('map').addEventListener('keydown',e=>{const p=e.target.closest('.pin');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();go(+p.dataset.i)}});
 document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;filter=b.dataset.f;view=null;sel=-1;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));render();drawMap()});
-document.getElementById('grid').addEventListener('click',async e=>{const a=e.target.closest('.addp');if(a){pickKey=a.dataset.k;picker.click();return}
+document.getElementById('grid').addEventListener('click',async e=>{const nav=e.target.closest('.gnav');if(nav){const g=nav.closest('.pc').querySelector('.gal');if(!g)return;const w=g.clientWidth,max=g.scrollWidth-w,d=nav.classList.contains('next')?1:-1;let x=Math.round(g.scrollLeft/w)*w+d*w;if(x>max+2)x=0;if(x<-2)x=max;g.scrollTo({left:x,behavior:'smooth'});return}
+ const a=e.target.closest('.addp');if(a){pickKey=a.dataset.k;picker.click();return}
  const x=e.target.closest('.rm');if(x){const k=x.dataset.k,id=x.dataset.id;const ids=(photos[k]||[]).filter(q=>q!==id);try{await db.doc('photos/'+k).set({ids});assets.delete(id).catch(()=>{})}catch(err){showMsg('Couldn\'t remove that photo.')}return}
  const m=e.target.closest('.onmap');if(m){const i=+m.dataset.i;openMap=openMap===i?-1:i;render();sel=openMap;drawMap();return}const h=e.target.closest('.heart');if(!h)return;const n=h.dataset.n;fav.has(n)?fav.delete(n):fav.add(n);save();render();drawMap()});
 
